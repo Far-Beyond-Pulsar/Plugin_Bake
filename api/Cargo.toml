@@ -1,0 +1,14 @@
+[package]
+name = "helio-bake-api"
+version = "0.1.0"
+edition = "2021"
+description = "Baked lighting's public contract (`pulsar.bake`): the lightmap-UV G-buffer payload, the per-object lightmap regions and their WGSL, and the PVS other kinds' culling reads. No baker, no nebula."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+bytemuck = { workspace = true, features = ["derive"] }
+helio-core = { workspace = true }
+helio-frame-api = { workspace = true }
+
+[dev-dependencies]
+naga = { version = "30", features = ["wgsl-in"] }

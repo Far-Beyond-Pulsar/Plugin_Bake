@@ -1,0 +1,26 @@
+[package]
+name = "bake_plugin"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Baked lighting (`pulsar.bake`): the plugin's root crate, the one place it registers everything it contributes (runtime registrations always, the editor's with `editor`)"
+
+[features]
+# Nothing yet: baking has no editor UI. Hosts turn it on with the rest of the
+# installed set's editor registrations.
+editor = []
+
+[dependencies]
+# The plugin gate and the registrations' collection.
+pulsar_plugins = { workspace = true }
+# The plugin's feature crate.
+helio-bake = { workspace = true }
+helio = { workspace = true }
+helio-feature-api = { workspace = true }
+# The engine seam the plugin registers into: the game's slim feature set (as
+# pulsar_game), so linking the plugin pulls no editor features into a game
+# build.
+engine_backend = { path = "../../../crates/core/engine_backend", default-features = false, features = ["render"] }
+
+[lints]
+workspace = true
