@@ -1,0 +1,30 @@
+[package]
+name = "helio-bake-host"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Baking for standalone Helio hosts (pulsar.bake): a bake's scene from SceneDB rows, the bake installed on a renderer, and its feature for a host's preset"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# The disk store goes through the engine's file system.
+engine_fs = { workspace = true }
+glam = { workspace = true }
+helio = { workspace = true }
+helio-bake = { workspace = true }
+helio-feature-api = { workspace = true }
+helio-light-api = { workspace = true, features = ["host-rows"] }
+helio-mesh-api = { workspace = true, features = ["host-rows"] }
+log = { workspace = true }
+pulsar_scenedb = { workspace = true }
+uuid = { version = "1" }
+
+[dev-dependencies]
+bytemuck = { workspace = true }
+helio-components = { workspace = true }
+helio-core = { workspace = true }
+helio-mats = { workspace = true, features = ["host-rows"] }
+helio-mesh-host = { workspace = true }
+helio-presets = { workspace = true }
+pollster = "0.4"
+wgpu = { workspace = true }

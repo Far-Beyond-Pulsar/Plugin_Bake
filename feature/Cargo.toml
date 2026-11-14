@@ -1,0 +1,38 @@
+[package]
+name = "helio-bake"
+version = "0.1.0"
+edition = "2021"
+description = "Baked lighting for Helio (pulsar.bake): Nebula bakes (indirect lightmaps, reflection probes, PVS) cached by their inputs, and the feature that renders them through the frame's contracts"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+helio-bake-api = { workspace = true }
+helio-core = { workspace = true }
+helio-feature-api = { workspace = true }
+helio-frame-api = { workspace = true }
+uuid = { version = "1" }
+# Nebula baker: the GPU bake passes live here.
+nebula = { path = "../vendor/nebula/crates/nebula", default-features = false, features = ["light", "probe", "visibility"] }
+
+# GPU
+wgpu.workspace = true
+bytemuck = { workspace = true, features = ["derive"] }
+half = { version = "2", features = ["bytemuck"] }
+glam = { workspace = true }
+
+# Async runtime (blocking wrapper around Nebula's async bake API)
+pollster = "=0.4.0"
+
+# On-disk cache, keyed by a hash of its inputs.
+serde = { workspace = true, features = ["derive"] }
+bincode = "1"
+twox-hash = { workspace = true, features = ["xxhash3_64"] }
+
+# Utilities
+log = { workspace = true }
+thiserror = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# Nebula enables UUID v4 generation, which uses getrandom 0.2. Select its
+# browser implementation explicitly for wasm32-unknown-unknown.
+getrandom = { version = "0.2", features = ["js"] }
