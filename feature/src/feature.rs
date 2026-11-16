@@ -92,6 +92,7 @@ impl Feature for BakeFeature {
                     Ok(())
                 },
             )
+            .once_per_frame()
             .in_slot(Slot::Prepare, -10),
         );
         registrar.node(
