@@ -44,8 +44,7 @@ impl ProbeBaker {
                 res, res, config.samples_per_face
             ),
         );
-        let face_data =
-            trace_cubemap(position, scene, config, ctx, &vbuf, &ibuf, &mbuf, res, mips)?;
+        let face_data = trace_cubemap(position, scene, config, ctx, &vbuf, &ibuf, &mbuf, res)?;
 
         reporter.step("probe", 2, "projecting irradiance SH");
         let coefficients = project_sh(&face_data, res, config.sh_order)?;
@@ -204,7 +203,6 @@ fn trace_cubemap(
     ibuf: &wgpu::Buffer,
     mbuf: &wgpu::Buffer,
     res: u32,
-    mip_levels: u32,
 ) -> Result<Vec<u8>, NebulaError> {
     use bytemuck::{Pod, Zeroable};
     use wgpu::util::DeviceExt;
@@ -221,8 +219,6 @@ fn trace_cubemap(
         view: [[f32; 4]; 4],
     }
 
-    // Allocate output storage: all 6 faces × mip chain (mip 0 = full res)
-    let bytes_per_pixel = if config.use_rgbe { 4usize } else { 16usize }; // RGBE u8×4 vs RGBA f32×4
     let mut all_face_data: Vec<u8> = Vec::new();
 
     let shader = ctx

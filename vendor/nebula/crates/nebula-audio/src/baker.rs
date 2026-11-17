@@ -5,10 +5,7 @@ use crate::{
 use async_trait::async_trait;
 use glam::Vec3;
 use nebula_core::{
-    context::BakeContext,
-    error::NebulaError,
-    progress::ProgressReporter,
-    scene::{LightSourceKind, SceneGeometry},
+    context::BakeContext, error::NebulaError, progress::ProgressReporter, scene::SceneGeometry,
     traits::BakePass,
 };
 
@@ -67,13 +64,13 @@ impl BakePass for AcousticBaker {
                 ),
             );
             let pos = Vec3::from(lp.position);
-            let rir = bake_listener(pos, scene, config, ctx, &geo)?;
+            let rir = bake_listener(pos, config, ctx, &geo)?;
             impulse_responses.push(rir);
         }
 
         reporter.step("acoustic", n as u32 + 1, "computing reverb zones");
         let reverb_zones = if config.emit_reverb_zone && !impulse_responses.is_empty() {
-            vec![derive_reverb_zone(scene, &impulse_responses)]
+            vec![derive_reverb_zone(&impulse_responses)]
         } else {
             Vec::new()
         };
@@ -200,7 +197,6 @@ fn upload_geometry(scene: &SceneGeometry, ctx: &BakeContext) -> Result<SceneGpu,
 
 fn bake_listener(
     pos: Vec3,
-    scene: &SceneGeometry,
     config: &AcousticConfig,
     ctx: &BakeContext,
     geo: &SceneGpu,
@@ -441,7 +437,7 @@ fn estimate_t60(samples: &[f32], sample_rate: u32) -> f32 {
 
 // ── Reverb zone derivation ────────────────────────────────────────────────────
 
-fn derive_reverb_zone(scene: &SceneGeometry, rirs: &[ImpulseResponse]) -> ReverbZone {
+fn derive_reverb_zone(rirs: &[ImpulseResponse]) -> ReverbZone {
     // Compute AABB from all listener positions
     let (mut mn, mut mx) = ([f32::MAX; 3], [f32::MIN; 3]);
     for rir in rirs {
