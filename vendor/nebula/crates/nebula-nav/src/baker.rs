@@ -93,7 +93,6 @@ struct Span {
     y_min: f32,
     y_max: f32,
     walkable: bool,
-    region: u32,
 }
 
 /// Compact height-field for a grid of XZ columns.
@@ -104,7 +103,6 @@ struct HeightField {
     gz: usize,
     world_min: [f32; 3],
     cell_size: f32,
-    cell_height: f32,
 }
 
 impl HeightField {
@@ -114,17 +112,12 @@ impl HeightField {
     fn col(&self, x: usize, z: usize) -> &[Span] {
         &self.cols[self.idx(x, z)]
     }
-    fn col_mut(&mut self, x: usize, z: usize) -> &mut Vec<Span> {
-        let i = z * self.gx + x;
-        &mut self.cols[i]
-    }
 }
 
 /// A simplified 2.5-D contour polygon.
 #[derive(Debug)]
 struct Contour {
     verts: Vec<[f32; 3]>,
-    region: u32,
 }
 
 // ── Scene AABB ────────────────────────────────────────────────────────────────
@@ -206,7 +199,6 @@ fn voxelise(
                         y_min: ymin.round_to(ch),
                         y_max: ymax.round_to(ch),
                         walkable,
-                        region: 0,
                     };
                     merge_span(&mut spans, new_span, ch);
                 }
@@ -222,7 +214,6 @@ fn voxelise(
         gz,
         world_min: aabb_min,
         cell_size: cs,
-        cell_height: ch,
     })
 }
 
@@ -273,12 +264,10 @@ struct WalkableSpan {
     x: usize,
     z: usize,
     y: f32,
-    region: u32,
 }
 
 fn filter_walkable(hf: &HeightField, config: &NavConfig) -> Vec<WalkableSpan> {
     let mut out = Vec::new();
-    let radius_cells = (config.agent_radius / hf.cell_size).ceil() as usize;
     for z in 0..hf.gz {
         for x in 0..hf.gx {
             for span in hf.col(x, z) {
@@ -302,7 +291,6 @@ fn filter_walkable(hf: &HeightField, config: &NavConfig) -> Vec<WalkableSpan> {
                     x,
                     z,
                     y: span.y_max,
-                    region: 0,
                 });
             }
         }
@@ -392,7 +380,7 @@ fn grow_regions_and_trace(
 
     contours_map
         .into_iter()
-        .map(|(region, verts)| Contour { verts, region })
+        .map(|(_, verts)| Contour { verts })
         .collect()
 }
 

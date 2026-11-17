@@ -259,9 +259,9 @@ fn upload_lights(scene: &SceneGeometry, ctx: &BakeContext) -> Result<wgpu::Buffe
             LightSourceKind::Area {
                 center,
                 right,
-                up,
                 half_w,
                 half_h,
+                ..
             } => GpuLight {
                 pos_range: [center[0], center[1], center[2], half_w * half_h],
                 dir_outer: [right[0], right[1], right[2], 0.0],
