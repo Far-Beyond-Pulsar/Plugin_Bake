@@ -69,10 +69,10 @@ fn spawn_box(world: &mut pulsar_scenedb::World, centre: Vec3, half: Vec3) {
                     u.to_array(),
                     1.0,
                 );
-                vertex.tex_coords1 = [
+                vertex.set_lightmap_uv([
                     cell[0] + (0.05 + 0.9 * (a * 0.5 + 0.5)) / 3.0,
                     cell[1] + (0.05 + 0.9 * (b * 0.5 + 0.5)) / 2.0,
-                ];
+                ]);
                 vertices.push(vertex);
             }
             indices.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
@@ -190,6 +190,11 @@ fn frame(
     for _ in 0..4 {
         scene.world.flush_gpu_mirror(queue);
         renderer.render(&camera, &view).unwrap();
+        // Pipelines compile off the frame: wait for them between frames, as
+        // a host's loading screen does.
+        while helio_core::compile::in_flight() > 0 {
+            std::thread::yield_now();
+        }
     }
     let readback = device.create_buffer(&wgpu::BufferDescriptor {
         label: None,

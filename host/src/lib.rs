@@ -89,11 +89,8 @@ pub fn mesh_upload_to_bake(
     // the G-buffer drawer reads too; a mesh without one (all zero) gets no
     // lightmap (it still occludes and reflects light in the bake). Tiled
     // UV0 is not a lightmap layout: its texels would overlap.
-    let has_uv1 = upload
-        .vertices
-        .iter()
-        .any(|v| v.tex_coords1[0].abs() > 1e-4 || v.tex_coords1[1].abs() > 1e-4);
-    let lightmap_uvs = has_uv1.then(|| upload.vertices.iter().map(|v| v.tex_coords1).collect());
+    let has_uv1 = upload.vertices.iter().any(|v| v.tex_coords1 != [0, 0]);
+    let lightmap_uvs = has_uv1.then(|| upload.vertices.iter().map(|v| v.lightmap_uv()).collect());
 
     helio_bake::BakeMesh {
         id,
